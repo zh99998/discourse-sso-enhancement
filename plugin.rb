@@ -5,7 +5,23 @@
 
 
 after_initialize do
+  
+  # logout
+  Discourse::Application.routes.append do
+    get "logout" => "session#destroy"
+  end
   SessionController.class_eval do
+    def destroy
+      reset_session
+      log_off_user
+      if params[:redirect]
+        redirect_to params[:redirect]
+      else
+        render nothing: true
+      end
+    end 
+    
+    # avatar
     def sso_provider(payload=nil)
       payload ||= request.query_string
       if SiteSetting.enable_sso_provider
