@@ -34,11 +34,8 @@ after_initialize do
           sso.external_id = current_user.id.to_s
           sso.admin = current_user.admin?
           sso.moderator = current_user.moderator?
-          if current_user.uploaded_avatar_id
-            relative_avatar_url = UserAvatar.local_avatar_url(Discourse.current_hostname, current_user.username, current_user.uploaded_avatar_id, 64)
-            sso.avatar_url = "#{Discourse.base_url}#{relative_avatar_url}"
-            sso.avatar_force_update = true
-          end
+          sso.avatar_url = (SiteSetting.use_https? ? 'https:' : 'http:') + current_user.avatar_template_url.gsub("{size}", "36");
+          sso.avatar_force_update = !!current_user.uploaded_avatar_id
           if request.xhr?
             cookies[:sso_destination_url] = sso.to_url(sso.return_sso_url)
           else
