@@ -11,6 +11,7 @@ after_initialize do
     get "logout" => "session#destroy"
   end
   SessionController.class_eval do
+    skip_before_filter :preload_json, :check_xhr, only: ['destroy']
     def destroy
       reset_session
       log_off_user
